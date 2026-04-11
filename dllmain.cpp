@@ -198,6 +198,22 @@ void ExceptHook(PEXCEPTION_RECORD ExceptionRecord, PCONTEXT ContextRecord)
         return;
     }
 
+    if (ExceptionRecord->ExceptionAddress == (PVOID)OFFSET(0x11D2580)) // CG_GetEntityImpactType crash
+    {
+        ContextRecord->Rax = FALSE;
+        ContextRecord->Rip = OFFSET(0x11D2592);
+        ZwContinue(ContextRecord, false);
+        return;
+    }
+
+    if (ExceptionRecord->ExceptionAddress == (PVOID)OFFSET(0x22C4935)) // DObjGetBoneIndex crash
+    {
+        ContextRecord->Rax = FALSE;
+        ContextRecord->Rip = OFFSET(0x22C49FE);
+        ZwContinue(ContextRecord, false);
+        return;
+    }
+
     if (ExceptionRecord->ExceptionAddress == (PVOID)SCRVM_Error)
     {
         ContextRecord->Rip += 4;
@@ -509,14 +525,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     case DLL_PROCESS_ATTACH:
     {
         DisableThreadLibraryCalls(hModule);
-        break;
-    }
-    case DLL_PROCESS_DETACH:
-    {
-		is_unhooking = true;
-        UninstallHook();
-        Protection::uninstall();
-        hooks::DestroyHooks();
         break;
     }
     }

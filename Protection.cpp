@@ -1693,25 +1693,6 @@ void Protection::ExceptHook(PEXCEPTION_RECORD ExceptionRecord, PCONTEXT ContextR
         return;
     }
 
-    if (ExceptionRecord->ExceptionRecord->ExceptionCode == 0xC0000005) {
-
-        if (ContextRecord->Rip == OFFSET(0x11D2580)) // CG_GetEntityImpactType crash
-        {
-            ContextRecord->Rax = FALSE;
-            ContextRecord->Rip = OFFSET(0x11D2592);
-            ZwContinue(ContextRecord, false);
-            return;
-        }
-
-        if (ContextRecord->Rip == OFFSET(0x22C4935)) // DObjGetBoneIndex crash
-        {
-            ContextRecord->Rax = FALSE;
-            ContextRecord->Rip = OFFSET(0x22C49FE);
-            ZwContinue(ContextRecord, false);
-            return;
-        }
-    }
-
     if (ExceptionRecord->ExceptionAddress == (PVOID)REBASE(0x234210C)) // character index crash
     {
         ContextRecord->Rip = REBASE(0x2342136);
