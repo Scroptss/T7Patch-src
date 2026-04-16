@@ -9,6 +9,46 @@ namespace hooks {
 	namespace functions
 	{
 
+		const char* hkBG_Cache_GetScriptMenuNameForIndex(unsigned int inst, unsigned int index)
+		{
+			if (index >= 64u)
+				return bad_str;
+
+			return BG_Cache_GetScriptMenuNameForIndex(inst, index);
+		}
+
+		const char* hkBG_Cache_GetEventStringNameForIndex(unsigned int inst, unsigned int index)
+		{
+			if (index >= 256u)
+				return bad_str;
+
+			return BG_Cache_GetEventStringNameForIndex(inst, index);
+		}
+
+		const char* hkBG_Cache_GetLocStringNameForIndex(unsigned int inst, unsigned int index)
+		{
+			if (index >= 2048u)
+				return bad_str;
+
+			return BG_Cache_GetLocStringNameForIndex(inst, index);
+		}
+
+		const char* hkBG_Cache_GetLUIMenuForIndex(unsigned int inst, unsigned int index)
+		{
+			if (index >= 64u)
+				return bad_str;
+
+			return BG_Cache_GetLUIMenuForIndex(inst, index);
+		}
+
+		const char* __fastcall hkBG_Cache_GetLUIMenuDataForIndex(unsigned int inst, unsigned int index)
+		{
+			if (index >= 128u)
+				return bad_str;
+
+			return BG_Cache_GetLUIMenuDataForIndex(inst, index);
+		}
+
 		void hkLiveInvites_AcceptInvite(UINT controllerIndex, DWORD* message, __int64 recepientXUID) // Prevent non-friends from 'pulling' us into lobbies.
 		{
 			if (Protection::IsFriendsOnly)
@@ -407,85 +447,7 @@ namespace hooks {
 
 		__int64 __fastcall hkLivePresence_Serialize(__int64 a1, __int64 a2)
 		{
-			
-			if (!a1 || !a2)
-				return 0;
-
-			__try
-			{
-				
-				if (!*(__int64*)a1)
-					return 0;
-
-				
-				int* flags = *(int**)(a1 + 16);
-				if (flags)
-				{
-					int v = (*flags >> 2) & 0x1F;
-					if (v > 31)
-					{
-						*flags = (*flags & ~0x7C) | (31 << 2);
-					}
-				}
-
-				int maxSlots = *(DWORD*)(a2 + 4);
-				if (maxSlots > 0 && maxSlots < 0x1000) 
-				{
-					for (int i = 0; i < maxSlots; i++)
-					{
-						char* entry = (char*)(a2 + 12 + (17 * i));
-
-						bool foundNull = false;
-						for (int j = 0; j < 17; j++)
-						{
-							if (entry[j] == '\0')
-							{
-								foundNull = true;
-								break;
-							}
-						}
-
-						if (!foundNull)
-						{
-							entry[16] = '\0';
-						}
-					}
-				}
-			}
-			__except (EXCEPTION_EXECUTE_HANDLER)
-			{
-				return 0;
-			}
-
-			__int64 result = 0;
-
-			__try
-			{
-				result = LivePresence_Serialize(a1, a2);
-			}
-			__except (EXCEPTION_EXECUTE_HANDLER)
-			{
-				return 0;
-			}
-
-			__try
-			{
-				int count = *(DWORD*)(a2 + 8);
-				if (count > 0 && count < 0x1000)
-				{
-					for (int i = 0; i < count; i++)
-					{
-						char* entry = (char*)(a2 + 12 + (17 * i));
-						entry[16] = '\0';
-					}
-				}
-			}
-			__except (EXCEPTION_EXECUTE_HANDLER)
-			{
-				// ignore
-			}
-
-			return result;
+			return 1; // Lol
 		}
 
 		bool hkLobbyMsgRW_PrepWriteMsg(__int64 lobbyMsg, __int64 data, int length, int msgType)
@@ -914,6 +876,11 @@ namespace hooks {
 		MH_CreateHook((LPVOID)REBASE(0x1E724A0), functions::hkLiveInvites_SendJoinInfo, (LPVOID*)&LiveInvites_SendJoinInfo);
 		MH_CreateHook((LPVOID)REBASE(0x1E72040), functions::hkLiveInvites_JoinMessageAction, (LPVOID*)&LiveInvites_JoinMessageAction);
 		MH_CreateHook((LPVOID)REBASE(0x1EA4E30), functions::hkUI_BrowserOpen, (LPVOID*)&UI_BrowserOpen);
+		MH_CreateHook((LPVOID)REBASE(0xA7DE0), functions::hkBG_Cache_GetScriptMenuNameForIndex, (LPVOID*)&BG_Cache_GetScriptMenuNameForIndex);
+		MH_CreateHook((LPVOID)REBASE(0xA78A0), functions::hkBG_Cache_GetEventStringNameForIndex, (LPVOID*)&BG_Cache_GetEventStringNameForIndex);
+		MH_CreateHook((LPVOID)REBASE(0xA7AB0), functions::hkBG_Cache_GetLocStringNameForIndex, (LPVOID*)&BG_Cache_GetLocStringNameForIndex);
+		MH_CreateHook((LPVOID)REBASE(0xA7A00), functions::hkBG_Cache_GetLUIMenuForIndex, (LPVOID*)&BG_Cache_GetLUIMenuForIndex);
+		MH_CreateHook((LPVOID)REBASE(0xA7990), functions::hkBG_Cache_GetLUIMenuDataForIndex, (LPVOID*)&BG_Cache_GetLUIMenuDataForIndex);		
 
 		MH_EnableHook(MH_ALL_HOOKS);
 	}

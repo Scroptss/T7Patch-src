@@ -145,7 +145,6 @@ const static auto UI_Model_AllocateNode = reinterpret_cast<__int32(__fastcall*)(
 const static auto UI_Model_CreateModelFromPath = reinterpret_cast<__int32(__fastcall*)(__int64 parentNodeIndex, const char* path)>REBASE(0x200CFC0);
 const static auto UI_Model_GetModelFromPath = reinterpret_cast<__int32(__fastcall*)(__int64 parentNodeIndex, const char* path)>REBASE(0x200D5B0);
 const static auto UI_Model_GetModelFromPath_0 = reinterpret_cast<__int32(__fastcall*)(__int64 parentNodeIndex, const char* path)>REBASE(0x200CF00);
-const static auto BG_Cache_GetModelForIndex = reinterpret_cast<const char* (__fastcall*)(unsigned __int32 inst, unsigned __int32 index)>REBASE(0xA7BC0);
 const static auto BG_Cache_GetLocStringNameForIndex = reinterpret_cast<const char* (__fastcall*)(unsigned __int32 inst, unsigned __int32 index)>REBASE(0xA7AB0);
 const static auto BG_Cache_GetLUIMenuForIndex = reinterpret_cast<const char* (__fastcall*)(unsigned __int32 inst, unsigned __int32 index)>REBASE(0xA7A00);
 const static auto BG_Cache_GetLUIMenuDataForIndex = reinterpret_cast<const char* (__fastcall*)(unsigned __int32 inst, unsigned __int32 index)>REBASE(0xA7990);
