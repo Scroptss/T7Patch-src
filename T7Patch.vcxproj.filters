@@ -13,51 +13,62 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Deps">
+      <UniqueIdentifier>{d2e8c1d9-adbf-4a88-a534-bf5fa3a9e817}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
+    <ClInclude Include="src\structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gscu_hashing.h">
+    <ClInclude Include="src\Protection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="offsets.h">
+    <ClInclude Include="src\offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Arxan.h">
+    <ClInclude Include="src\Hooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Hooks.h">
+    <ClInclude Include="src\gscu_hashing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="minhook\include\MinHook.h">
+    <ClInclude Include="src\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Protection.h">
+    <ClInclude Include="src\Arxan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="structs.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="deps\minhook\include\MinHook.h">
+      <Filter>Deps</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="src\Arxan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gscu_hashing.cpp">
+    <ClCompile Include="src\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Arxan.cpp">
+    <ClCompile Include="src\gscu_hashing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Hooks.cpp">
+    <ClCompile Include="src\Hooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="offsets.cpp">
+    <ClCompile Include="src\offsets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Protection.cpp">
+    <ClCompile Include="src\Protection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="deps\minhook\lib\libMinHook.x64.lib">
+      <Filter>Deps</Filter>
+    </Library>
+    <Library Include="deps\detours\detours.lib">
+      <Filter>Deps</Filter>
+    </Library>
   </ItemGroup>
 </Project>
