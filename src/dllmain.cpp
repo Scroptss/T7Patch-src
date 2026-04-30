@@ -285,7 +285,7 @@ void ExceptHook(PEXCEPTION_RECORD ExceptionRecord, PCONTEXT ContextRecord)
             lck_dumping = GetCurrentThreadId();
 
             FILE* f;
-            f = fopen(CRASH_LOG_NAME, "a+"); // a+ (create + append)
+            f = fopen(CRASH_LOG_NAME, "a+"); // a+ (create + append)    
             if (!f)
             {
 #ifdef USE_NLOG

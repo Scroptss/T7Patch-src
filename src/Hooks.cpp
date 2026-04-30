@@ -456,7 +456,30 @@ namespace hooks {
 
 		__int64 __fastcall hkLivePresence_Serialize(__int64 a1, __int64 a2)
 		{
-			return 1; // Lol
+			if (!a1 || !a2)
+				return 0;
+
+			int* packedPtr = *reinterpret_cast<int**>(a1 + 16);
+
+			if (!packedPtr)
+				return 0;
+
+			int packed = *packedPtr;
+			int count = (packed >> 2) & 0x1F;
+
+			constexpr int maxPlayers = 18;
+
+			if (count > maxPlayers)
+			{
+				int sanitized = packed;
+
+				sanitized &= ~(0x1F << 2);
+				sanitized |= (maxPlayers & 0x1F) << 2;
+
+				*packedPtr = sanitized;
+			}
+
+			return LivePresence_Serialize(a1, a2);
 		}
 
 		bool hkLobbyMsgRW_PrepWriteMsg(__int64 lobbyMsg, __int64 data, int length, int msgType)
