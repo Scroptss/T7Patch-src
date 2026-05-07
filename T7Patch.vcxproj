@@ -70,22 +70,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>.\build\</OutDir>
-    <IntDir>.\build\$(ShortProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>.\build\</OutDir>
-    <IntDir>.\build\$(ShortProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>.\build\</OutDir>
-    <IntDir>.\build\$(ShortProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>.\build\</OutDir>
-    <IntDir>.\build\$(ShortProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -100,8 +84,6 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(ProjectDir)deps\minhook\lib\libMinHook.x64.lib;$(ProjectDir)deps\detours\detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/NODEFAULTLIB:LIBCMTD %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -120,8 +102,6 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(ProjectDir)deps\minhook\lib\libMinHook.x64.lib;$(ProjectDir)deps\detours\detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/NODEFAULTLIB:LIBCMTD %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -138,8 +118,6 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(ProjectDir)deps\minhook\lib\libMinHook.x64.lib;$(ProjectDir)deps\detours\detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/NODEFAULTLIB:LIBCMTD %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,31 +136,26 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(ProjectDir)deps\minhook\lib\libMinHook.x64.lib;$(ProjectDir)deps\detours\detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/NODEFAULTLIB:LIBCMTD %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>$(SolutionDir)minhook\lib\libMinHook.x64.lib;$(SolutionDir)detours\detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="deps\minhook\include\MinHook.h" />
-    <ClInclude Include="src\Arxan.h" />
-    <ClInclude Include="src\framework.h" />
-    <ClInclude Include="src\gscu_hashing.h" />
-    <ClInclude Include="src\Hooks.h" />
-    <ClInclude Include="src\offsets.h" />
-    <ClInclude Include="src\Protection.h" />
-    <ClInclude Include="src\structs.h" />
+    <ClInclude Include="Arxan.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="gscu_hashing.h" />
+    <ClInclude Include="Hooks.h" />
+    <ClInclude Include="minhook\include\MinHook.h" />
+    <ClInclude Include="offsets.h" />
+    <ClInclude Include="Protection.h" />
+    <ClInclude Include="structs.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Arxan.cpp" />
-    <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\gscu_hashing.cpp" />
-    <ClCompile Include="src\Hooks.cpp" />
-    <ClCompile Include="src\offsets.cpp" />
-    <ClCompile Include="src\Protection.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="deps\detours\detours.lib" />
-    <Library Include="deps\minhook\lib\libMinHook.x64.lib" />
+    <ClCompile Include="Arxan.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="gscu_hashing.cpp" />
+    <ClCompile Include="Hooks.cpp" />
+    <ClCompile Include="offsets.cpp" />
+    <ClCompile Include="Protection.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
