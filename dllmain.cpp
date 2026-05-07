@@ -506,6 +506,11 @@ void RunPatching()
     Protection::install();
 }
 
+EXPORT void EnableInjectorlessInstall() // must be called BEFORE loading the patch via zbr_run_gamemode_lui
+{
+    Protection::IsInjectorlessInstall = true;
+}
+
 EXPORT void zbr_run_gamemode_lui(const char* input)
 {
 
@@ -514,6 +519,68 @@ EXPORT void zbr_run_gamemode_lui(const char* input)
         RunPatching();
     }
 
+}
+
+EXPORT void Unload()
+{
+    HANDLE hThreadSnap = INVALID_HANDLE_VALUE;
+    THREADENTRY32 te32;
+
+    hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    te32.dwSize = sizeof(THREADENTRY32);
+
+    if (Thread32First(hThreadSnap, &te32))
+    {
+        do
+        {
+            if (te32.th32OwnerProcessID == GetCurrentProcessId() && te32.th32ThreadID != GetCurrentThreadId())
+            {
+                auto hThread = OpenThread(THREAD_ALL_ACCESS, false, te32.th32ThreadID);
+
+                if (hThread)
+                {
+                    SuspendThread(hThread);
+                    CONTEXT tContext{};
+                    tContext.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+                    if (GetThreadContext(hThread, &tContext))
+                    {
+                        tContext.Dr7 = 0;
+                        tContext.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+                        SetThreadContext(hThread, &tContext);
+                    }
+                    CloseHandle(hThread);
+                }
+            }
+        } while (Thread32Next(hThreadSnap, &te32));
+    }
+
+    CloseHandle(hThreadSnap);
+
+    Protection::uninstall();
+    is_unhooking = true;
+    UninstallHook();
+
+    hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    te32.dwSize = sizeof(THREADENTRY32);
+
+    if (Thread32First(hThreadSnap, &te32))
+    {
+        do
+        {
+            if (te32.th32OwnerProcessID == GetCurrentProcessId() && te32.th32ThreadID != GetCurrentThreadId())
+            {
+                auto hThread = OpenThread(THREAD_ALL_ACCESS, false, te32.th32ThreadID);
+
+                if (hThread)
+                {
+                    ResumeThread(hThread);
+                    CloseHandle(hThread);
+                }
+            }
+        } while (Thread32Next(hThreadSnap, &te32));
+    }
+
+    CloseHandle(hThreadSnap);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule,

@@ -2,6 +2,7 @@
 
 bool has_set_window_text = false;
 bool Protection::IsFriendsOnly = false;
+bool Protection::IsInjectorlessInstall = true;
 __int64 Protection::PrivatePassword[3] = { 0, 0 };
 char Protection::CustomName[16] = { 0 };
 std::unordered_map<BYTE, std::function<void(__int32* lobbyMsgTypePtr, __int64 lobbyMsg)>> Protection::handle_packet_callbacks;
@@ -290,6 +291,11 @@ std::unordered_map<INT32, bool> dlcContent;
 
 bool Protection::GetOwnsContent(INT64 _interface, INT32 itemid)
 {
+    if (SPOOF_UNLOCK_ALL == true)
+    {
+        return true;
+    }
+
     if (dlcContent.find(itemid) == dlcContent.end())
     {
         check_dlc_next = GetTickCount64() + (60 * 10 * 1000);
@@ -300,6 +306,11 @@ bool Protection::GetOwnsContent(INT64 _interface, INT32 itemid)
 
 bool Protection::GetOwnsContent2(INT64 _interface, INT32 itemid)
 {
+    if (SPOOF_UNLOCK_ALL == true)
+    {
+        return true;
+    }
+
     if (dlcContent.find(itemid) == dlcContent.end())
     {
         check_dlc_next = GetTickCount64() + (60 * 10 * 1000);
@@ -996,9 +1007,11 @@ void Protection::install()
     Dvar_SetFromStringByName("sv_mapswitch", "0", true);
     Dvar_SetFromStringByName("maxvoicepacketsperframe", "0", true);
 
-    load_settings_initial();
-    CreateThread(nullptr, 0, MainThread, nullptr, 0, nullptr);
-
+    if (IsInjectorlessInstall)
+    {
+        load_settings_initial();
+        CreateThread(nullptr, 0, MainThread, nullptr, 0, nullptr);
+    }
 }
 
 void Protection::uninstall()
@@ -1693,9 +1706,18 @@ void Protection::ExceptHook(PEXCEPTION_RECORD ExceptionRecord, PCONTEXT ContextR
         return;
     }
 
-    if (ExceptionRecord->ExceptionAddress == (PVOID)REBASE(0x234210C)) // character index crash
+    // From v2.04
+    if (ExceptionRecord->ExceptionAddress == (PVOID)REBASE(0x22C965C)) // character index crash
     {
-        ContextRecord->Rip = REBASE(0x2342136);
+        ContextRecord->Rip = REBASE(0x22C9686);
+        ZwContinue(ContextRecord, false);
+        return;
+    }
+
+    // From v2.04
+    if (ExceptionRecord->ExceptionAddress == (PVOID)REBASE(0x22C9676)) // character index crash
+    {
+        ContextRecord->Rip = REBASE(0x22C9686);
         ZwContinue(ContextRecord, false);
         return;
     }

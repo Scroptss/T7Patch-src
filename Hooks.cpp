@@ -9,6 +9,57 @@ namespace hooks {
 	namespace functions
 	{
 
+		__int64 hkLiveInventory_GetItemQuantity(ControllerIndex_t controllerIndex, int itemId) {
+
+			if (SPOOF_UNLOCK_ALL == true) return 999;
+
+			return LiveInventory_GetItemQuantity(controllerIndex, itemId);
+		}
+
+		bool hkLiveInventory_AreExtraSlotsPurchased(ControllerIndex_t controllerIndex) {
+		
+			if (SPOOF_UNLOCK_ALL == true) return 999;
+			
+				return true;
+
+			return LiveInventory_AreExtraSlotsPurchased(controllerIndex);
+		}
+
+		const char* hkInfo_ValueForKey(char* a1, __int64 a2)
+		{
+			// log a2
+
+
+			return Info_ValueForKey(a1, a2);
+		}
+
+		bool hkLiveInventory_IsValid(ControllerIndex_t controllerIndex) {
+
+			return true;
+		}
+
+		bool hkLiveEntitlements_IsEntitlementActiveForController(ControllerIndex_t controllerIndex, int incentiveId) {
+
+			if (SPOOF_UNLOCK_ALL == true) return 999;
+				return true; 
+
+
+			return LiveEntitlements_IsEntitlementActiveForController(controllerIndex, incentiveId);
+		}
+
+
+		char hkUserHasLicenseForApp(__int64 mapInfo, __int64* userObj) {
+			if (SPOOF_UNLOCK_ALL == true)
+			{
+				*((BYTE*)userObj + 13) = 1;
+				*((BYTE*)userObj + 12) |= 0;
+				*((DWORD*)userObj + 4) |= 8u;
+
+				return 1;
+			}
+
+			return UserHasLicenseForApp(mapInfo, userObj);
+		}
 		const char* hkBG_Cache_GetScriptMenuNameForIndex(unsigned int inst, unsigned int index)
 		{
 			if (index >= 64u)
@@ -126,6 +177,14 @@ namespace hooks {
 			auto v7 = *(int**)(Sys_GetTLS() + 24);
 			auto v8 = *v7;
 			auto message = **(CHAR***)&v7[2 * v8 + 34];
+
+			// From v2.04
+			auto mode = Com_SessionMode_GetModeName();
+
+			if ((!Protection::I_stricmp(message, "requeststats") || !Protection::I_stricmp(message, "requeststats\n")) && !Protection::I_stricmp(mode, "CP"))
+			{
+				return CL_ConnectionlessCMD(clientNum, from, msg);
+			}
 
 			// Filter packets, only allow legit packets through, block the rest
 			if (is_in_array(message, legit_packets)) {
@@ -447,7 +506,30 @@ namespace hooks {
 
 		__int64 __fastcall hkLivePresence_Serialize(__int64 a1, __int64 a2)
 		{
-			return 1; // Lol
+			if (!a1 || !a2)
+				return 0;
+
+			int* packedPtr = *reinterpret_cast<int**>(a1 + 16);
+
+			if (!packedPtr)
+				return 0;
+
+			int packed = *packedPtr;
+			int count = (packed >> 2) & 0x1F;
+
+			constexpr int maxPlayers = 18;
+
+			if (count > maxPlayers)
+			{
+				int sanitized = packed;
+
+				sanitized &= ~(0x1F << 2);
+				sanitized |= (maxPlayers & 0x1F) << 2;
+
+				*packedPtr = sanitized;
+			}
+
+			return LivePresence_Serialize(a1, a2);
 		}
 
 		bool hkLobbyMsgRW_PrepWriteMsg(__int64 lobbyMsg, __int64 data, int length, int msgType)
@@ -876,11 +958,17 @@ namespace hooks {
 		MH_CreateHook((LPVOID)REBASE(0x1E724A0), functions::hkLiveInvites_SendJoinInfo, (LPVOID*)&LiveInvites_SendJoinInfo);
 		MH_CreateHook((LPVOID)REBASE(0x1E72040), functions::hkLiveInvites_JoinMessageAction, (LPVOID*)&LiveInvites_JoinMessageAction);
 		MH_CreateHook((LPVOID)REBASE(0x1EA4E30), functions::hkUI_BrowserOpen, (LPVOID*)&UI_BrowserOpen);
-		MH_CreateHook((LPVOID)REBASE(0xA7DE0), functions::hkBG_Cache_GetScriptMenuNameForIndex, (LPVOID*)&BG_Cache_GetScriptMenuNameForIndex);
+		/*MH_CreateHook((LPVOID)REBASE(0xA7DE0), functions::hkBG_Cache_GetScriptMenuNameForIndex, (LPVOID*)&BG_Cache_GetScriptMenuNameForIndex);
 		MH_CreateHook((LPVOID)REBASE(0xA78A0), functions::hkBG_Cache_GetEventStringNameForIndex, (LPVOID*)&BG_Cache_GetEventStringNameForIndex);
 		MH_CreateHook((LPVOID)REBASE(0xA7AB0), functions::hkBG_Cache_GetLocStringNameForIndex, (LPVOID*)&BG_Cache_GetLocStringNameForIndex);
 		MH_CreateHook((LPVOID)REBASE(0xA7A00), functions::hkBG_Cache_GetLUIMenuForIndex, (LPVOID*)&BG_Cache_GetLUIMenuForIndex);
-		MH_CreateHook((LPVOID)REBASE(0xA7990), functions::hkBG_Cache_GetLUIMenuDataForIndex, (LPVOID*)&BG_Cache_GetLUIMenuDataForIndex);		
+		MH_CreateHook((LPVOID)REBASE(0xA7990), functions::hkBG_Cache_GetLUIMenuDataForIndex, (LPVOID*)&BG_Cache_GetLUIMenuDataForIndex);*/
+		MH_CreateHook((LPVOID)REBASE(0x1EAAD60), functions::hkUserHasLicenseForApp, (LPVOID*)&UserHasLicenseForApp);
+		MH_CreateHook((LPVOID)REBASE(0x1DFCC60), functions::hkLiveInventory_GetItemQuantity, (LPVOID*)&LiveInventory_GetItemQuantity);
+		MH_CreateHook((LPVOID)REBASE(0x1E06110), functions::hkLiveEntitlements_IsEntitlementActiveForController, (LPVOID*)&LiveEntitlements_IsEntitlementActiveForController);
+		MH_CreateHook((LPVOID)REBASE(0x1DFC580), functions::hkLiveInventory_AreExtraSlotsPurchased, (LPVOID*)&LiveInventory_AreExtraSlotsPurchased);
+		MH_CreateHook((LPVOID)REBASE(0x1DFDFE0), functions::hkLiveInventory_IsValid, (LPVOID*)&LiveInventory_IsValid);
+		MH_CreateHook((LPVOID)REBASE(0x227BDA0), functions::hkInfo_ValueForKey, (LPVOID*)&Info_ValueForKey);
 
 		MH_EnableHook(MH_ALL_HOOKS);
 	}
