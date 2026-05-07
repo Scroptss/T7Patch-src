@@ -127,16 +127,7 @@ namespace hooks {
 			auto v8 = *v7;
 			auto message = **(CHAR***)&v7[2 * v8 + 34];
 
-			// From v2.04
-			auto mode = Com_SessionMode_GetModeName();
-			
-			if ((!Protection::I_stricmp(message, "requeststats") || !Protection::I_stricmp(message, "requeststats\n")) && !Protection::I_stricmp(mode, "CP")) 
-			{
-				return CL_ConnectionlessCMD(clientNum, from, msg);
-			}
-
 			// Filter packets, only allow legit packets through, block the rest
-
 			if (is_in_array(message, legit_packets)) {
 				return CL_ConnectionlessCMD(clientNum, from, msg);
 			}
@@ -476,21 +467,13 @@ namespace hooks {
 
 		bool hkLobbyMsgRW_PrepReadMsg(__int64 lm)
 		{
-			if (!LobbyMsgRW_PrepReadMsg(lm))
-				return false;
-
-			if (!ZBR_PREFIX_BYTE)
+			if (LobbyMsgRW_PrepReadMsg(lm) && (!ZBR_PREFIX_BYTE || ((((unsigned char(__fastcall*)(__int64))PTR_MSG_ReadByte)(lm) == ZBR_PREFIX_BYTE) && (((unsigned char(__fastcall*)(__int64))PTR_MSG_ReadByte)(lm) == ZBR_PREFIX_BYTE2)) ))
+			{
+				// ALOG("valid pkt %d", *(__int32*)(lm + 0x38));
 				return true;
+			}
 
-			auto readByte = (unsigned char(__fastcall*)(__int64))PTR_MSG_ReadByte;
-
-			unsigned char b1 = readByte(lm);
-			unsigned char b2 = readByte(lm);
-
-			if (b1 == ZBR_PREFIX_BYTE && b2 == ZBR_PREFIX_BYTE2)
-				return true;
-
-			return false;
+			return true;
 		}
 
 		bool hkLobbyMsgRW_PackageInt(LobbyMsg* lobbyMsg, const char* key, __int32* val)
@@ -895,7 +878,7 @@ namespace hooks {
 		MH_CreateHook((LPVOID)REBASE(0x1EA4E30), functions::hkUI_BrowserOpen, (LPVOID*)&UI_BrowserOpen);
 		MH_CreateHook((LPVOID)REBASE(0xA7DE0), functions::hkBG_Cache_GetScriptMenuNameForIndex, (LPVOID*)&BG_Cache_GetScriptMenuNameForIndex);
 		MH_CreateHook((LPVOID)REBASE(0xA78A0), functions::hkBG_Cache_GetEventStringNameForIndex, (LPVOID*)&BG_Cache_GetEventStringNameForIndex);
-		//MH_CreateHook((LPVOID)REBASE(0xA7AB0), functions::hkBG_Cache_GetLocStringNameForIndex, (LPVOID*)&BG_Cache_GetLocStringNameForIndex); // Unused
+		MH_CreateHook((LPVOID)REBASE(0xA7AB0), functions::hkBG_Cache_GetLocStringNameForIndex, (LPVOID*)&BG_Cache_GetLocStringNameForIndex);
 		MH_CreateHook((LPVOID)REBASE(0xA7A00), functions::hkBG_Cache_GetLUIMenuForIndex, (LPVOID*)&BG_Cache_GetLUIMenuForIndex);
 		MH_CreateHook((LPVOID)REBASE(0xA7990), functions::hkBG_Cache_GetLUIMenuDataForIndex, (LPVOID*)&BG_Cache_GetLUIMenuDataForIndex);		
 

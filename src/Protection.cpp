@@ -1693,10 +1693,9 @@ void Protection::ExceptHook(PEXCEPTION_RECORD ExceptionRecord, PCONTEXT ContextR
         return;
     }
 
-    // From v2.04
-    if (ExceptionRecord->ExceptionAddress == (PVOID)REBASE(0x22C965C) || ExceptionRecord->ExceptionAddress == (PVOID)REBASE(0x22C9676)) // character index crash
+    if (ExceptionRecord->ExceptionAddress == (PVOID)REBASE(0x234210C)) // character index crash
     {
-        ContextRecord->Rip = REBASE(0x22C9686);
+        ContextRecord->Rip = REBASE(0x2342136);
         ZwContinue(ContextRecord, false);
         return;
     }
