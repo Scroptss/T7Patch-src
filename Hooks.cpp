@@ -12,7 +12,12 @@ namespace hooks {
 		__int64 hkLiveInventory_GetItemQuantity(ControllerIndex_t controllerIndex, int itemId) {
 
 			#if SPOOF_UNLOCK_ALL
-				return 999;
+				// Source: /gamedata/loot/zmlootitems.csv
+				if (itemId >= 1000000010 && itemId < 1000000200) {
+					return SPOOF_GUM_COUNT;
+				} else {
+					return 1;
+				}
 			#endif
 
 			return LiveInventory_GetItemQuantity(controllerIndex, itemId);
