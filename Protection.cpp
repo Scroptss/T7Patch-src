@@ -661,6 +661,7 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 
     for (;;)
     {
+        arxan_bypass::maintain();
         if (user_config.update_watcher_time(PATCH_CONFIG_LOCATION))
         {
             user_config.loadfrom(PATCH_CONFIG_LOCATION);

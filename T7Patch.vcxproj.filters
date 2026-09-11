@@ -27,6 +27,9 @@
     <ClInclude Include="Arxan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameBuild.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Hooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
