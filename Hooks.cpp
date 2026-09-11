@@ -574,7 +574,8 @@ namespace hooks {
 
 			if (result && (!Protection::I_stricmp(key, "lobbytype") || !Protection::I_stricmp(key, "srclobbytype") || !Protection::I_stricmp(key, "destlobbytype")))
 			{
-				if (*val < 0 || *val > 1)
+
+				if (*val < LOBBY_TYPE_FIRST || *val > LOBBY_TYPE_LAST)
 				{
 					//XLOG("DROP LOBBYTYPE");
 					return false;
@@ -588,7 +589,7 @@ namespace hooks {
 			bool result = LobbyMsgRW_PackageUInt(lobbyMsg, key, val);
 			if (result && (!Protection::I_stricmp(key, "lobbytype") || !Protection::I_stricmp(key, "srclobbytype") || !Protection::I_stricmp(key, "destlobbytype")))
 			{
-				if (*val > 1)
+				if (*val > static_cast<unsigned __int32>(LOBBY_TYPE_LAST))
 				{
 					return false;
 				}
