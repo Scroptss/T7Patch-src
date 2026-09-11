@@ -291,10 +291,9 @@ std::unordered_map<INT32, bool> dlcContent;
 
 bool Protection::GetOwnsContent(INT64 _interface, INT32 itemid)
 {
-    if (SPOOF_UNLOCK_ALL == true)
-    {
+    #if SPOOF_UNLOCK_ALL
         return true;
-    }
+    #endif
 
     if (dlcContent.find(itemid) == dlcContent.end())
     {
@@ -306,10 +305,9 @@ bool Protection::GetOwnsContent(INT64 _interface, INT32 itemid)
 
 bool Protection::GetOwnsContent2(INT64 _interface, INT32 itemid)
 {
-    if (SPOOF_UNLOCK_ALL == true)
-    {
+    #if SPOOF_UNLOCK_ALL
         return true;
-    }
+    #endif
 
     if (dlcContent.find(itemid) == dlcContent.end())
     {

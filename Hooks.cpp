@@ -11,54 +11,70 @@ namespace hooks {
 
 		__int64 hkLiveInventory_GetItemQuantity(ControllerIndex_t controllerIndex, int itemId) {
 
-			if (SPOOF_UNLOCK_ALL == true) return 999;
+			#if SPOOF_UNLOCK_ALL
+				// Source: /gamedata/loot/zmlootitems.csv
+				if (itemId >= 1000000010 && itemId < 1000000200) {
+					return SPOOF_GUM_COUNT;
+				} else {
+					return 1;
+				}
+			#endif
 
 			return LiveInventory_GetItemQuantity(controllerIndex, itemId);
 		}
 
 		bool hkLiveInventory_AreExtraSlotsPurchased(ControllerIndex_t controllerIndex) {
 		
-			if (SPOOF_UNLOCK_ALL == true) return 999;
-			
+			#if SPOOF_UNLOCK_ALL
 				return true;
+			#endif
 
 			return LiveInventory_AreExtraSlotsPurchased(controllerIndex);
 		}
 
-		const char* hkInfo_ValueForKey(char* a1, __int64 a2)
-		{
-			// log a2
-
-
+		const char* hkInfo_ValueForKey(char* a1, __int64 a2) {
 			return Info_ValueForKey(a1, a2);
 		}
 
 		bool hkLiveInventory_IsValid(ControllerIndex_t controllerIndex) {
-
 			return true;
 		}
 
 		bool hkLiveEntitlements_IsEntitlementActiveForController(ControllerIndex_t controllerIndex, int incentiveId) {
 
-			if (SPOOF_UNLOCK_ALL == true) return 999;
-				return true; 
-
+			#if SPOOF_UNLOCK_ALL
+				return true;
+			#endif
 
 			return LiveEntitlements_IsEntitlementActiveForController(controllerIndex, incentiveId);
 		}
 
-		char hkUserHasLicenseForApp(__int64 mapInfo, __int64* userObj) {
-			if (SPOOF_UNLOCK_ALL == true)
-			{
+bool hkUserHasLicenseForApp(__int64 mapInfo, __int64* userObj) {
+#if SPOOF_UNLOCK_ALL
+	if (userObj)
+	{
+		*((BYTE*)userObj + 13) = 1;
+		*((BYTE*)userObj + 12) |= 0;
+		*((DWORD*)userObj + 4) |= 8u;
+	}
+	return true;
+#else
+	// Spoof disabled: preserve a safe default (no license)
+	return false;
+#endif
+}
+
 				*((BYTE*)userObj + 13) = 1;
 				*((BYTE*)userObj + 12) |= 0;
 				*((DWORD*)userObj + 4) |= 8u;
 
-				return 1;
-			}
+				return true;
+				
+			#endif
 
 			return UserHasLicenseForApp(mapInfo, userObj);
 		}
+
 		const char* hkBG_Cache_GetScriptMenuNameForIndex(unsigned int inst, unsigned int index)
 		{
 			if (index >= 64u)
