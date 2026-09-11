@@ -1004,7 +1004,7 @@ void Protection::install()
     *(DWORD*)(ptrDvar + 0x18) = 0; // clear flags
 
     Dvar_SetFromStringByName("g_allowvote", "0", true);
-    Dvar_SetFromStringByName("sv_mapswitch", "0", true);
+    //Dvar_SetFromStringByName("sv_mapswitch", "0", true); // Caused inf black screen when loading campaign maps.
     Dvar_SetFromStringByName("maxvoicepacketsperframe", "0", true);
 
     if (IsInjectorlessInstall)

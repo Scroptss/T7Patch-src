@@ -47,7 +47,6 @@ namespace hooks {
 			return LiveEntitlements_IsEntitlementActiveForController(controllerIndex, incentiveId);
 		}
 
-
 		char hkUserHasLicenseForApp(__int64 mapInfo, __int64* userObj) {
 			if (SPOOF_UNLOCK_ALL == true)
 			{
