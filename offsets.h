@@ -1,7 +1,8 @@
 #pragma once
 #include "framework.h"
+#include "GameBuild.h"
 
-#define OFFSET(x) ((INT64)GetModuleHandleA(NULL) + (INT64)x)
+#define OFFSET(x) ((INT64)bo3::address(static_cast<std::uintptr_t>(x)))
 #define REBASE(x) OFFSET(x)
 #define _DOFFSET(x) x
 #define EXPORT extern "C" __declspec(dllexport)

@@ -481,14 +481,19 @@ void RunPatching()
 	// Set the process priority to above normal to help with performance
     SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
 
+    std::string arxanMessage;
+    if (!arxan_bypass::install(arxanMessage))
+    {
+        arxanMessage = "T7 Patch: " + arxanMessage + "\n";
+        OutputDebugStringA(arxanMessage.c_str());
+        return;
+    }
+
 	// Initialize MinHook
     MH_Initialize();
 
 	// Set a default player name if none is set
     if (!*Protection::CustomName) { snprintf(Protection::CustomName, 16, "Unknown Soldier"); }
-
-    // Take care of arxan
-    PatchChecksumComparisons_Precomputed();
 
     // Apply VMP Hooks
     hooks::ApplyVMTHooks();

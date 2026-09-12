@@ -661,6 +661,7 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 
     for (;;)
     {
+        arxan_bypass::maintain();
         if (user_config.update_watcher_time(PATCH_CONFIG_LOCATION))
         {
             user_config.loadfrom(PATCH_CONFIG_LOCATION);
@@ -993,13 +994,13 @@ void Protection::install()
     // Call create lobby again
     ((void(__fastcall*)(__int64))REBASE(0x1EA6010))(REBASE(0x113A4A60));
 
-    //INT64 ptrDvar = *(INT64*)(REBASE(0x1686ED20));
-    //*(DWORD*)(ptrDvar + 0x18) = 0; // clear flags
+    INT64 ptrDvar = *(INT64*)(REBASE(0x1686ED20));
+    *(DWORD*)(ptrDvar + 0x18) = 0; // clear flags
 
     Dvar_SetFromStringByName("ui_error_callstack_ship", "1", true);
 
-    //ptrDvar = *(INT64*)(REBASE(0xA0378B8));
-    //*(DWORD*)(ptrDvar + 0x18) = 0; // clear flags
+    ptrDvar = *(INT64*)(REBASE(0xA0378B8));
+    *(DWORD*)(ptrDvar + 0x18) = 0; // clear flags
 
     Dvar_SetFromStringByName("g_allowvote", "0", true);
 

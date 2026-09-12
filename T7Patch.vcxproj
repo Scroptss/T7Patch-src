@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Arxan.h" />
+    <ClInclude Include="GameBuild.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="gscu_hashing.h" />
     <ClInclude Include="Hooks.h" />
