@@ -13,7 +13,7 @@ namespace hooks {
 
 		__int64 hkLiveInventory_GetItemQuantity(ControllerIndex_t controllerIndex, int itemId) {
 
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 				// Source: /gamedata/loot/zmlootitems.csv
 				if (itemId >= 1000000010 && itemId < 1000000200) {
 					return SPOOF_GUM_COUNT;
@@ -27,7 +27,7 @@ namespace hooks {
 
 		bool hkLiveInventory_AreExtraSlotsPurchased(ControllerIndex_t controllerIndex) {
 		
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 				return true;
 			#endif
 
@@ -41,7 +41,7 @@ namespace hooks {
 		// Caused uninstalled content to show as available.
 		bool hkLiveInventory_IsValid(ControllerIndex_t controllerIndex) {
 
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 				return true;
 			#endif
 
@@ -51,7 +51,7 @@ namespace hooks {
 		// Source: /gamedata/store/common/incentives.csv
 		bool hkLiveEntitlements_IsEntitlementActiveForController(ControllerIndex_t controllerIndex, int incentiveId) {
 
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 
 				// Invalid / Duplicates
 				if (incentiveId == 29 || incentiveId == 30 || incentiveId == 34) {
@@ -74,7 +74,7 @@ namespace hooks {
 		}
 
 		bool hkUserHasLicenseForApp(__int64 mapInfo, __int64* userObj) {
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 				if (userObj)
 				{
 					*((BYTE*)userObj + 13) = 1;
