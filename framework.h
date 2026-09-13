@@ -141,6 +141,7 @@ inline std::vector<std::string> legit_packets = {
 #define ZBR_WINDOW_TEXT "Call of Duty: Black Ops III (community patch by serious)"
 #define ZBR_VERSION_FULL "Patch 3.07 - by serious <3"
 #define SPOOF_OWNERSHIP false
+#define SPOOF_RANKED false
 #define SPOOF_UNLOCK false
 #define SPOOF_SKIP_CWL false
 #define SPOOF_GUM_COUNT 255
