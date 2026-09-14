@@ -27,7 +27,13 @@
     <ClInclude Include="Arxan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CampaignFixes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="GameBuild.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaSymbols.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Hooks.h">
@@ -51,6 +57,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Arxan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CampaignFixes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaSymbols.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Hooks.cpp">

@@ -141,7 +141,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Arxan.h" />
+    <ClInclude Include="CampaignFixes.h" />
     <ClInclude Include="GameBuild.h" />
+    <ClInclude Include="LuaSymbols.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="gscu_hashing.h" />
     <ClInclude Include="Hooks.h" />
@@ -152,6 +154,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Arxan.cpp" />
+    <ClCompile Include="CampaignFixes.cpp" />
+    <ClCompile Include="LuaSymbols.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="gscu_hashing.cpp" />
     <ClCompile Include="Hooks.cpp" />

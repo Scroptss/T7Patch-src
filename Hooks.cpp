@@ -1,4 +1,6 @@
 #include "Hooks.h"
+#include "CampaignFixes.h"
+#include "LuaSymbols.h"
 
 const char zbr_window_text[] = ZBR_WINDOW_TEXT;
 void* pOriginalGSFailure = nullptr;
@@ -955,6 +957,8 @@ namespace hooks {
 
 	void ApplyHooks()
 	{
+		campaign_fixes::InstallHooks();
+		lua_symbols::InstallHooks();
 		MH_CreateHook((LPVOID)REBASE(0x1EEA560), functions::hkLobbyMsgRW_PrepWriteMsg, (LPVOID*)&LobbyMsgRW_PrepWriteMsg);
 		MH_CreateHook((LPVOID)REBASE(0x1EEB8D0), functions::hkLobbyMsgRW_PrepReadMsg, (LPVOID*)&LobbyMsgRW_PrepReadMsg);
 		MH_CreateHook((LPVOID)REBASE(0x20E31C0), functions::hkCOD_GetBuildTitle, (LPVOID*)&COD_GetBuildTitle);

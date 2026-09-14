@@ -282,39 +282,69 @@ bool Protection::IsFriendByXUIDUncached(__int64 xuid) // ok I say its "uncached"
     return friends_set.find(xuid) != friends_set.end();
 }
 
-unsigned __int64 check_dlc_next = 0;
-std::unordered_map<INT32, bool> dlcContent;
-// BIsDlcInstalled
-// 0x30 has similar signature and seems to be used the same way
-// 0x18 isvacbanned
-// 0xB0 GetDlcDownloadProgress
+namespace
+{
+    bool IsModeContentFilePresent(INT32 appId)
+    {
+        const wchar_t* contentFile = nullptr;
+        switch (appId)
+        {
+        case 366840:
+            contentFile = L"cp_common.xpak";
+            break;
+        case 366841:
+            contentFile = L"mp_common.xpak";
+            break;
+        case 366842:
+            contentFile = L"zm_common.xpak";
+            break;
+        default:
+            return true;
+        }
+
+        wchar_t executablePath[MAX_PATH]{};
+        const auto pathLength = GetModuleFileNameW(nullptr, executablePath, MAX_PATH);
+        if (pathLength == 0 || pathLength >= MAX_PATH)
+        {
+            return false;
+        }
+
+        std::error_code error;
+        const auto path = std::filesystem::path(executablePath).parent_path() / L"zone" / contentFile;
+        return std::filesystem::is_regular_file(path, error);
+    }
+}
+
+std::unordered_map<INT32, bool> installedDlcContent;
+std::unordered_map<INT32, bool> subscribedAppContent;
 
 bool Protection::GetOwnsContent(INT64 _interface, INT32 itemid)
 {
     #if SPOOF_UNLOCK_ALL
-        return true;
+        return IsModeContentFilePresent(itemid);
     #endif
 
-    if (dlcContent.find(itemid) == dlcContent.end())
+    if (installedDlcContent.find(itemid) == installedDlcContent.end())
     {
-        check_dlc_next = GetTickCount64() + (60 * 10 * 1000);
-        dlcContent[itemid] = ((bool(__fastcall*)(INT64, INT64))GetOriginalSteamPtr(STEAMAPI_INTERFACE, STEAMAPI_INTERFACE_CHECK_OWNS_CONTENT))(_interface, itemid);
+        const auto steamReportsInstalled = ((bool(__fastcall*)(INT64, INT32))GetOriginalSteamPtr(
+            STEAMAPI_INTERFACE, STEAMAPI_INTERFACE_CHECK_OWNS_CONTENT))(_interface, itemid);
+        installedDlcContent[itemid] = steamReportsInstalled && IsModeContentFilePresent(itemid);
     }
-    return dlcContent[itemid];
+    return installedDlcContent[itemid];
 }
 
 bool Protection::GetOwnsContent2(INT64 _interface, INT32 itemid)
 {
     #if SPOOF_UNLOCK_ALL
-        return true;
+        return IsModeContentFilePresent(itemid);
     #endif
 
-    if (dlcContent.find(itemid) == dlcContent.end())
+    if (subscribedAppContent.find(itemid) == subscribedAppContent.end())
     {
-        check_dlc_next = GetTickCount64() + (60 * 10 * 1000);
-        dlcContent[itemid] = ((bool(__fastcall*)(INT64, INT64))GetOriginalSteamPtr(STEAMAPI_INTERFACE, STEAMAPI_INTERFACE_CHECK_OWNS_CONTENT2))(_interface, itemid);
+        subscribedAppContent[itemid] = ((bool(__fastcall*)(INT64, INT32))GetOriginalSteamPtr(
+            STEAMAPI_INTERFACE, STEAMAPI_INTERFACE_CHECK_OWNS_CONTENT2))(_interface, itemid);
     }
-    return dlcContent[itemid];
+    return subscribedAppContent[itemid];
 }
 
 bool Protection::IsVacBanned(INT64 a)
