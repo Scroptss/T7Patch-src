@@ -165,3 +165,5 @@ const static auto LiveInventory_AreExtraSlotsPurchased = reinterpret_cast<bool(_
 const static auto LiveInventory_IsValid = reinterpret_cast<bool(__fastcall*)(ControllerIndex_t controllerIndex)>REBASE(0x1DFDFE0);
 const static auto Info_ValueForKey = reinterpret_cast<const char*(__fastcall*)(char* a1, __int64 a2)>REBASE(0x227BDA0);
 const static auto LiveInventory_GetItemQuantity = reinterpret_cast<__int64(__fastcall*)(ControllerIndex_t controllerIndex, int itemId)>REBASE(0x1DFCC60);
+const static auto Mods_IsModsLoaded = reinterpret_cast<bool(__fastcall*)()>REBASE(0x20C8F60);
+const static auto Mods_IsModsLoaded_1 = reinterpret_cast<bool(__fastcall*)()>REBASE(0x20C9AE0);

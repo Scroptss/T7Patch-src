@@ -320,7 +320,7 @@ std::unordered_map<INT32, bool> subscribedAppContent;
 
 bool Protection::GetOwnsContent(INT64 _interface, INT32 itemid)
 {
-    #if SPOOF_UNLOCK_ALL
+    #if SPOOF_OWNERSHIP
         return IsModeContentFilePresent(itemid);
     #endif
 
@@ -335,7 +335,7 @@ bool Protection::GetOwnsContent(INT64 _interface, INT32 itemid)
 
 bool Protection::GetOwnsContent2(INT64 _interface, INT32 itemid)
 {
-    #if SPOOF_UNLOCK_ALL
+    #if SPOOF_OWNERSHIP
         return IsModeContentFilePresent(itemid);
     #endif
 

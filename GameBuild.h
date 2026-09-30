@@ -75,21 +75,34 @@ namespace bo3
         return current_build() != Build::Unknown;
     }
 
-    constexpr std::uintptr_t translate_rva(std::uintptr_t rva, Build build)
+    constexpr std::uintptr_t get_live_rva(std::uintptr_t februaryRva, Build build)
     {
         if (build == Build::September2026 &&
-            rva >= SeptemberShiftStartRva && rva < PrimaryCodeEndRva)
-            return rva - SeptemberCodeDelta;
-        return rva;
+            februaryRva >= SeptemberShiftStartRva && februaryRva < PrimaryCodeEndRva)
+            return februaryRva - SeptemberCodeDelta;
+        return februaryRva;
+    }
+
+    constexpr std::uintptr_t get_february_rva(std::uintptr_t liveRva, Build build)
+    {
+        if (build == Build::September2026 &&
+            liveRva >= SeptemberShiftStartRva && liveRva < PrimaryCodeEndRva)
+            return liveRva + SeptemberCodeDelta;
+        return liveRva;
     }
 
     inline std::uintptr_t address(std::uintptr_t februaryRva)
     {
-        return image_base() + translate_rva(februaryRva, current_build());
+        return image_base() + get_live_rva(februaryRva, current_build());
     }
 
-    static_assert(translate_rva(0x1DECFD0, Build::September2026) == 0x1DEC910);
-    static_assert(translate_rva(0x226B0A0, Build::September2026) == 0x226A9E0);
-    static_assert(translate_rva(0x1686E948, Build::September2026) == 0x1686E948);
-    static_assert(translate_rva(0x1DECFD0, Build::February2026) == 0x1DECFD0);
+    inline std::uintptr_t february_rva(std::uintptr_t address)
+    {
+        return get_february_rva(address - image_base(), current_build());
+    }
+
+    static_assert(get_live_rva(0x1DECFD0, Build::September2026) == 0x1DEC910);
+    static_assert(get_live_rva(0x226B0A0, Build::September2026) == 0x226A9E0);
+    static_assert(get_live_rva(0x1686E948, Build::September2026) == 0x1686E948);
+    static_assert(get_live_rva(0x1DECFD0, Build::February2026) == 0x1DECFD0);
 }

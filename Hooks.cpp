@@ -8,12 +8,57 @@ const char* bad_str = "bad";
 
 namespace hooks {
 
+	// From Scropts-QOL
+	const std::vector<uintptr_t> isModLoadedAddrs =
+	{
+		{ 0x20EB3C4 },
+		{ 0x20EB3E4 },
+		{ 0x20EB324 },
+		{ 0x20EB2F4 },
+		{ 0x20EAD97 },
+		{ 0x13E6A74 },
+		{ 0x15E7EDB },
+		{ 0x15E87DB },
+		{ 0x15EBAE9 },
+		{ 0x15F1F29 },
+		{ 0x15F1FD9 },
+		{ 0x15F20A0 },
+		{ 0x15F7F60 },
+		{ 0x1A80D1D },
+		{ 0x1A9AD29 },
+		{ 0x1E9432B },
+		{ 0x1E9C8AE },
+		{ 0x1EA5669 },
+		{ 0x1EBF6CD },
+		{ 0x20EAD5D },
+	};
+
+	uintptr_t GetCallsiteFromReturn(void* returnAddress)
+	{
+		uint8_t* ret = (uint8_t*)returnAddress;
+
+		if (ret[-5] == 0xE8)
+		{
+			return (uintptr_t)(ret - 5);
+		}
+
+		for (int i = 1; i <= 16; i++)
+		{
+			if (ret[-i] == 0xE8)
+			{
+				return (uintptr_t)(ret - i);
+			}
+		}
+
+		return (uintptr_t)returnAddress;
+	}
+
 	namespace functions
 	{
 
 		__int64 hkLiveInventory_GetItemQuantity(ControllerIndex_t controllerIndex, int itemId) {
 
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 				// Source: /gamedata/loot/zmlootitems.csv
 				if (itemId >= 1000000010 && itemId < 1000000200) {
 					return SPOOF_GUM_COUNT;
@@ -27,7 +72,7 @@ namespace hooks {
 
 		bool hkLiveInventory_AreExtraSlotsPurchased(ControllerIndex_t controllerIndex) {
 		
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 				return true;
 			#endif
 
@@ -41,7 +86,7 @@ namespace hooks {
 		// Caused uninstalled content to show as available.
 		bool hkLiveInventory_IsValid(ControllerIndex_t controllerIndex) {
 
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 				return true;
 			#endif
 
@@ -51,7 +96,7 @@ namespace hooks {
 		// Source: /gamedata/store/common/incentives.csv
 		bool hkLiveEntitlements_IsEntitlementActiveForController(ControllerIndex_t controllerIndex, int incentiveId) {
 
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 
 				// Invalid / Duplicates
 				if (incentiveId == 29 || incentiveId == 30 || incentiveId == 34) {
@@ -74,7 +119,7 @@ namespace hooks {
 		}
 
 		bool hkUserHasLicenseForApp(__int64 mapInfo, __int64* userObj) {
-			#if SPOOF_UNLOCK_ALL
+			#if SPOOF_UNLOCK
 				if (userObj)
 				{
 					*((BYTE*)userObj + 13) = 1;
@@ -893,7 +938,39 @@ namespace hooks {
 		bool hkMods_SubscribeUGC(__int64 a1)
 		{			
 			return false;
-		}				
+		}
+
+		// From Scropts-QOL
+		bool hkMods_IsModsLoaded()
+		{
+
+			#if SPOOF_RANKED
+
+				void* ret = _ReturnAddress();
+				uintptr_t callsite = GetCallsiteFromReturn(ret);
+				uintptr_t relativeCall = bo3::february_rva(callsite);
+
+				for (auto addr : isModLoadedAddrs)
+				{
+					if (relativeCall == addr)
+					{
+						return false;
+					}
+				}
+
+			#endif
+
+			return Mods_IsModsLoaded();
+		}
+
+		bool hkMods_IsModsLoaded_1() 
+		{
+			#if SPOOF_RANKED
+				return false;
+			#endif
+
+			return Mods_IsModsLoaded_1();
+		}
 	}
 
 	void ApplyVMTHooks()
@@ -1005,6 +1082,8 @@ namespace hooks {
 		MH_CreateHook((LPVOID)REBASE(0x1DFC580), functions::hkLiveInventory_AreExtraSlotsPurchased, (LPVOID*)&LiveInventory_AreExtraSlotsPurchased);
 		MH_CreateHook((LPVOID)REBASE(0x1DFDFE0), functions::hkLiveInventory_IsValid, (LPVOID*)&LiveInventory_IsValid);
 		MH_CreateHook((LPVOID)REBASE(0x227BDA0), functions::hkInfo_ValueForKey, (LPVOID*)&Info_ValueForKey);
+		MH_CreateHook((LPVOID)REBASE(0x20C8F60), functions::hkMods_IsModsLoaded, (LPVOID*)&Mods_IsModsLoaded);
+		MH_CreateHook((LPVOID)REBASE(0x20C9AE0), functions::hkMods_IsModsLoaded_1, (LPVOID*)&Mods_IsModsLoaded_1);
 
 		MH_EnableHook(MH_ALL_HOOKS);
 	}
