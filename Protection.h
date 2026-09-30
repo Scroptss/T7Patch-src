@@ -63,7 +63,7 @@ public:
 	static char requestOut[0x20000];
 	static char lobbyMsgCpy[0x50];
 	static bool IsFriendsOnly;
-	static bool IsMTLPatchEnabled;
+	static bool IsAutoInstallModsEnabled;
 	static bool IsInjectorlessInstall;
 
 	static void install();

@@ -2,6 +2,7 @@
 
 bool has_set_window_text = false;
 bool Protection::IsFriendsOnly = false;
+bool Protection::IsAutoInstallModsEnabled = false;
 bool Protection::IsInjectorlessInstall = true;
 __int64 Protection::PrivatePassword[3] = { 0, 0 };
 char Protection::CustomName[16] = { 0 };
@@ -176,6 +177,11 @@ SD(addrbuff)
 EXPORT void SetFriendsOnly(bool isFriendsOnly)
 {
     Protection::IsFriendsOnly = isFriendsOnly;
+}
+
+EXPORT void SetAutoInstallMods(bool isEnabled)
+{
+    Protection::IsAutoInstallModsEnabled = isEnabled;
 }
 
 EXPORT void SetPlayerName(const char* name)

@@ -971,6 +971,17 @@ namespace hooks {
 
 			return Mods_IsModsLoaded_1();
 		}
+
+		bool hkMods_SubscribeUGC(__int64 a1)
+		{
+			if (!Protection::IsAutoInstallModsEnabled)
+			{
+				return false;
+			}
+
+			return Mods_SubscribeUGC(a1);
+		}
+
 	}
 
 	void ApplyVMTHooks()
