@@ -555,6 +555,7 @@ struct patch_config
 {
     char playername[16];
     int isfriendsonly;
+    int autoinstallmods;
     char* networkpassword;
     bool exists;
     std::filesystem::file_time_type modified;
@@ -564,6 +565,7 @@ struct patch_config
         networkpassword = (char*)malloc(4);
         memset(networkpassword, 0, 4);
         isfriendsonly = true;
+        autoinstallmods = false;
         exists = false;
         modified = std::filesystem::file_time_type();
         __playername();
@@ -606,6 +608,7 @@ struct patch_config
 
         outfile << "playername=" << playername << std::endl;
         outfile << "isfriendsonly=" << isfriendsonly << std::endl;
+        outfile << "autoinstallmods=" << autoinstallmods << std::endl;
         outfile << "networkpassword=" << networkpassword << std::endl;
 
         outfile.close();
@@ -657,6 +660,20 @@ struct patch_config
                 }
             }
             break;
+            case FNV32("autoinstallmods"):
+            {
+                std::istringstream ivalread(val);
+                ivalread >> autoinstallmods;
+                if (ivalread.fail())
+                {
+                    autoinstallmods = false;
+                }
+                else
+                {
+                    autoinstallmods = autoinstallmods == 1;
+                }
+            }
+            break;
             case FNV32("networkpassword"):
             {
                 if (networkpassword)
@@ -687,6 +704,7 @@ void apply_settings()
 {
     SetPlayerName(user_config.playername);
     SetFriendsOnly(user_config.isfriendsonly);
+    SetAutoInstallMods(user_config.autoinstallmods);
     SetNetworkPassword(user_config.networkpassword);
 }
 

@@ -935,11 +935,6 @@ namespace hooks {
 			return UI_Model_AllocateNode(ancestorIndex, path, persistent);
 		}
 
-		bool hkMods_SubscribeUGC(__int64 a1)
-		{			
-			return false;
-		}
-
 		// From Scropts-QOL
 		bool hkMods_IsModsLoaded()
 		{
