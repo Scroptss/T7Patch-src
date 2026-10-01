@@ -597,8 +597,7 @@ struct patch_config
 
     void saveto(const char* path)
     {
-        std::ofstream outfile;
-        outfile.open(path, std::ofstream::out | std::ofstream::binary);
+        std::ofstream outfile(path);
 
         if (!outfile.is_open())
         {
@@ -617,8 +616,7 @@ struct patch_config
 
     void loadfrom(const char* path)
     {
-        std::ifstream infile;
-        infile.open(path, std::ifstream::in | std::ifstream::binary);
+        std::ifstream infile(path);
 
         if (!infile.is_open())
         {
@@ -627,10 +625,16 @@ struct patch_config
         }
 
         std::string line;
-        while (!std::getline(infile, line).eof())
+        while (std::getline(infile, line))
         {
+
+            if (!line.empty() && line.back() == '\r')
+            {
+                line.pop_back();
+            }
+
             auto sep = line.find("=");
-            if (sep == std::string::npos || sep >= (line.length() - 1)) // must have a value
+            if (sep == std::string::npos) // must have a value
             {
                 continue;
             }
@@ -638,10 +642,15 @@ struct patch_config
             // is this config resilliant to whitespace issues? nope!
             auto token = line.substr(0, sep);
             auto val = line.substr(sep + 1);
-            switch (fnv1a(token.data()))
+            switch (fnv1a(token.c_str()))
             {
             case FNV32("playername"):
             {
+                if (val.empty())
+                {
+                    break;
+                }
+
                 if (val.length() > 15)
                 {
                     val = val.substr(0, 15);
@@ -652,6 +661,12 @@ struct patch_config
             break;
             case FNV32("isfriendsonly"):
             {
+                if (val.empty())
+                {
+                    isfriendsonly = false;
+                    break;
+                }
+
                 std::istringstream ivalread(val);
                 ivalread >> isfriendsonly;
                 if (ivalread.fail())
@@ -662,6 +677,12 @@ struct patch_config
             break;
             case FNV32("autoinstallmods"):
             {
+                if (val.empty())
+                {
+                    autoinstallmods = false;
+                    break;
+                }
+
                 std::istringstream ivalread(val);
                 ivalread >> autoinstallmods;
                 if (ivalread.fail())
@@ -683,11 +704,17 @@ struct patch_config
                 }
                 if (val.length() > 1023)
                 {
-                    val = val.substr(0, 1023); // seriously?!
+                    val.resize(1023); // seriously?!
                 }
                 auto bufsize = val.length() + 1;
-                networkpassword = (char*)malloc(bufsize);
-                strcpy_s(networkpassword, bufsize, val.data());
+                networkpassword = static_cast<char*>(malloc(bufsize));
+                
+                if (networkpassword)
+                {
+                    strcpy_s(networkpassword, bufsize, val.c_str());
+                }
+
+                break;
             }
             break;
             }

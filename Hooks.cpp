@@ -627,13 +627,19 @@ namespace hooks {
 
 		bool hkLobbyMsgRW_PrepReadMsg(__int64 lm)
 		{
-			if (LobbyMsgRW_PrepReadMsg(lm) && (!ZBR_PREFIX_BYTE || ((((unsigned char(__fastcall*)(__int64))PTR_MSG_ReadByte)(lm) == ZBR_PREFIX_BYTE) && (((unsigned char(__fastcall*)(__int64))PTR_MSG_ReadByte)(lm) == ZBR_PREFIX_BYTE2)) ))
+			if (!LobbyMsgRW_PrepReadMsg(lm))
 			{
-				// ALOG("valid pkt %d", *(__int32*)(lm + 0x38));
+				return false;
+			}
+
+			if (!ZBR_PREFIX_BYTE)
+			{
 				return true;
 			}
 
-			return true;
+			const auto prefix1 = ((unsigned char(__fastcall*)(__int64))PTR_MSG_ReadByte)(lm);
+			const auto prefix2 = ((unsigned char(__fastcall*)(__int64))PTR_MSG_ReadByte)(lm);
+			return prefix1 == ZBR_PREFIX_BYTE && prefix2 == ZBR_PREFIX_BYTE2;
 		}
 
 		bool hkLobbyMsgRW_PackageInt(LobbyMsg* lobbyMsg, const char* key, __int32* val)
@@ -665,6 +671,10 @@ namespace hooks {
 			}
 			if (result && (!Protection::I_stricmp(key, "datamask")))
 			{
+				if (*val == 0)
+				{
+					return false;
+				}
 				__int32 state = *(__int32*)REBASE(0x1686E874);
 				state = state << 28 >> 28;
 				if (state)
@@ -695,7 +705,7 @@ namespace hooks {
 			char szMenuName[1024]{};
 
 			// cant call original cause arxan pointer decryption routines, but its fine we can just recreate and omit some other useless stuff while we are at it.
-			int nesting = *(__int32*)REBASE(0x1681BEB0); // REBASE(0x1689AE94)
+			int nesting = *(__int32*)REBASE(0x1681BEB0);
 			int num_args = ((__int32*)REBASE(0x1681BF14))[nesting];
 			int menuIndex = 0;
 
@@ -706,13 +716,18 @@ namespace hooks {
 			else
 			{
 				SV_Cmd_ArgvBuffer(1, szMenuName, 1024);
+
 				auto svId = atoi(szMenuName);
+
 				if (svId != *(__int32*)REBASE(0x17679580))
 				{
 					return; // unamused
 				}
+
 				SV_Cmd_ArgvBuffer(2, szMenuName, 1024);
+
 				menuIndex = atoi(szMenuName);
+
 				if ((unsigned __int32)menuIndex > 0x3Fu)
 				{
 					szMenuName[0] = 0;
@@ -721,6 +736,7 @@ namespace hooks {
 				{
 					strcpy_s(szMenuName, BG_Cache_GetScriptMenuNameForIndex(0, menuIndex));
 				}
+
 				SV_Cmd_ArgvBuffer(3, mres, 1024);
 			}
 
@@ -729,19 +745,32 @@ namespace hooks {
 				return;
 			}
 
+			auto mode = Com_SessionMode_GetModeName();
+
+			bool isCampaign = mode && !Protection::I_stricmp(mode, "CP");
+
 			if (*(__int32*)ent) // not host
 			{
-				if (!(Protection::I_stricmp(mres, "killserverpc") && Protection::I_stricmp(mres, "endgame") && Protection::I_stricmp(mres, "endround") && Protection::I_stricmp(mres, "restart_level_zm")))
+				bool killServer = !Protection::I_stricmp(mres, "killserverpc");
+				bool endGame = !Protection::I_stricmp(mres, "endgame");
+				bool endRound = !Protection::I_stricmp(mres, "endround");
+				bool restartLevelZM = !Protection::I_stricmp(mres, "restart_level_zm");
+
+				if (killServer || restartLevelZM ||	(!isCampaign && (endGame || endRound)))
 				{
 					// someone who is not host tried to end the game
-					snprintf(mres, 1024, "tempBanClient %i\n", *(__int32*)ent); // kick them
+					snprintf(mres, 1024, "tempBanClient %i\n", *(__int32*)ent);
 					Protection::Cbuf_AddText(0, mres, 0);
 					return;
 				}
 			}
 
-			if (Protection::I_stricmp(mres, "killserverpc") && Protection::I_stricmp(mres, "endgame") && Protection::I_stricmp(mres, "endround")
-				|| LobbyHost_IsHost(1u))
+			bool killServer = !Protection::I_stricmp(mres, "killserverpc");
+			bool endGame = !Protection::I_stricmp(mres, "endgame");
+			bool endRound =	!Protection::I_stricmp(mres, "endround");
+			bool campaignTransition = isCampaign && (endGame || endRound);
+
+			if ((!killServer && !endGame && !endRound) || campaignTransition ||	LobbyHost_IsHost(1u))
 			{
 				Scr_AddString(0, mres);
 				Scr_AddString(0, szMenuName);
@@ -751,11 +780,10 @@ namespace hooks {
 			else
 			{
 				// someone who is not host tried to end the game
-				snprintf(mres, 1024, "tempBanClient %i\n", *(__int32*)ent); // kick them
+				snprintf(mres, 1024, "tempBanClient %i\n", *(__int32*)ent);
 				Protection::Cbuf_AddText(0, mres, 0);
 				return;
 			}
-
 		}
 
 		void hk_CMD_MenuResponseCached_f(char* ent)
@@ -800,29 +828,43 @@ namespace hooks {
 				return;
 			}
 
+			auto mode = Com_SessionMode_GetModeName();
+			bool isCampaign = mode && !Protection::I_stricmp(mode, "CP");
+
 			if (*(__int32*)ent) // not host
 			{
-				if (!(Protection::I_stricmp(mres, "killserverpc") && Protection::I_stricmp(mres, "endgame") && Protection::I_stricmp(mres, "endround") && Protection::I_stricmp(mres, "restart_level_zm")))
+				bool killServer = !Protection::I_stricmp(mres, "killserverpc");
+				bool endGame = !Protection::I_stricmp(mres, "endgame");
+				bool endRound = !Protection::I_stricmp(mres, "endround");
+				bool restartLevelZM = !Protection::I_stricmp(mres, "restart_level_zm");
+
+				if (killServer || restartLevelZM || (!isCampaign && (endGame || endRound)))
 				{
-					// someone who is not host tried to end the game
-					snprintf(mres, 1024, "tempBanClient %i\n", *(__int32*)ent); // kick them
+					snprintf(mres, 1024, "tempBanClient %i\n", *(__int32*)ent);
 					Protection::Cbuf_AddText(0, mres, 0);
 					return;
 				}
 			}
 
-			if (Protection::I_stricmp(mres, "killserverpc") && Protection::I_stricmp(mres, "endgame") && Protection::I_stricmp(mres, "endround")
-				|| LobbyHost_IsHost(1u))
+			bool killServer = !Protection::I_stricmp(mres, "killserverpc");
+			bool endGame = !Protection::I_stricmp(mres, "endgame");
+			bool endRound = !Protection::I_stricmp(mres, "endround");
+
+			bool campaignTransition =isCampaign && (endGame || endRound);
+
+			if ((!killServer && !endGame && !endRound) || campaignTransition ||	LobbyHost_IsHost(1u))
 			{
 				Scr_AddString(0, mres);
 				Scr_AddString(0, szMenuName);
+
 				__int32 thread = Scr_ExecEntThread(ent, (void*)*(__int64*)REBASE(0xA5A6810), 2);
+
 				Scr_FreeThread(0, thread);
 			}
 			else
 			{
-				// someone who is not host tried to end the game
-				snprintf(mres, 1024, "tempBanClient %i\n", *(__int32*)ent); // kick them
+				snprintf(mres, 1024, "tempBanClient %i\n", *(__int32*)ent);
+
 				Protection::Cbuf_AddText(0, mres, 0);
 				return;
 			}
